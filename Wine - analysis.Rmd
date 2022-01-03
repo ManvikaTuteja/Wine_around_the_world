@@ -1,0 +1,129 @@
+---
+title: "Wine around the world - Analysis"
+output: pdf_document
+---
+
+
+```{r}
+#setting working directory
+getwd()
+
+#loading libraries 
+
+library('tidyverse')
+library('dplyr')
+library('tidyr')
+library('stringr')
+library('lubridate')
+library('magrittr')
+library('ggplot2')
+
+```
+
+
+#Data-set used : wine_data.csv 
+
+```{r}
+
+df_wine <- read.csv('wine_data.csv')
+
+#Looking at the region with the highest average price of wine for different countries 
+
+df_france <- filter(df_wine, country == "France")
+
+df_france_new <- df_france %>%
+  group_by(country, region_1) %>%
+  summarise(average_price = mean(price)) %>%
+  arrange(desc(average_price)) %>%
+  drop_na()
+head(df_france_new, n = 1)
+
+df_us <- filter(df_wine, country == "US")
+
+df_us_new <- df_us %>%
+  group_by(country, region_1) %>%
+  summarise(average_price = mean(price)) %>%
+  arrange(desc(average_price)) %>%
+  drop_na()
+head(df_us_new, n = 1)
+
+df_italy <- filter(df_wine, country == "Italy")
+
+df_italy_new <- df_italy %>%
+  group_by(country, region_1) %>%
+  summarise(average_price = mean(price)) %>%
+  arrange(desc(average_price)) %>%
+  drop_na()
+head(df_italy_new, n = 1)
+
+```
+
+#Output
+We get the regions with the highest average price in France, US and Italy. 
+
+
+```{r}
+
+#calculating the average price by designation of different wines and then filtering the top 10 
+
+df_des <- df_wine %>% 
+  group_by(designation) %>%
+  summarise(Average_Price = mean(price)) %>%
+  arrange(desc(Average_Price)) %>%
+  drop_na()
+
+head(df_des, 10)
+
+```
+
+#Output
+
+We get a set of wines grouped by their designation and summarized by the average price. 
+
+
+```{r}
+
+#Checking for the highest average price based on variety and then filtering the top 1o 
+
+df_variety <- df_wine %>%
+  group_by(variety) %>% 
+  summarise(Highest_Average_Price = mean(price)) %>%
+  arrange(desc(Highest_Average_Price)) %>%
+  drop_na()
+
+head(df_variety, 10)
+
+```
+#Output
+
+The code above gives the varieties with the highest average prices. 
+
+```{r}
+
+#finding the number of 20 year old wines using the "designation" column
+
+df_20yrold <- union_all(
+  str_which(df_wine$designation, '20 Y'),
+   str_which(df_wine$designation, '20-Y'),
+   str_which(df_wine$designation, '20_Y'),
+   str_which(df_wine$designation, '20 y'),
+   str_which(df_wine$designation, '20-y'),
+   str_which(df_wine$designation, '20_y'),
+   str_which(df_wine$designation, '20 Yr.'),
+   str_which(df_wine$designation, '20 yr.'),
+   str_which(df_wine$designation, '20 ANNI'),
+   str_which(df_wine$designation, '20 anni'),
+   str_which(df_wine$designation, '20 Anni'),
+   str_which(df_wine$designation, '20 ANOS'),
+   str_which(df_wine$designation, '20 ans'),
+   str_which(df_wine$designation, '20 anos')
+)
+
+#anni, anos, ans stands for years. 
+
+length(df_20yrold)
+
+```
+
+#Output
+There are 84 wines that are 20 years old. 
